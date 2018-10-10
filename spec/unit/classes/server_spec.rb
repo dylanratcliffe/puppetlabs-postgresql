@@ -217,4 +217,23 @@ describe 'postgresql::server', type: :class do
         .with_address('192.0.2.100')
     end
   end
+
+  describe 'additional instances' do
+    let(:pre_condition) {
+      <<-MANIFEST
+      postgresql_conf { 'instance 1 foo.bar':
+        name   => 'foo.bar',
+        value  => '/etc/foo',
+        target => '/etc/postgresql1.conf'
+      }
+      postgresql_conf { 'instance 2 foo.bar':
+        name   => 'foo.bar',
+        value  => '/etc/foo',
+        target => '/etc/postgresql2.conf'
+      }
+      MANIFEST
+    }
+
+    it { is_expected.to compile.with_all_deps }
+  end
 end

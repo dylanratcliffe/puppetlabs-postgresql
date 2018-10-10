@@ -10,7 +10,7 @@ describe Puppet::Type.type(:postgresql_conf) do
 
   describe 'namevar validation' do
     it 'has :name as its namevar' do
-      expect(described_class.key_attributes).to eq([:name])
+      expect(described_class.key_attributes).to eq([:name, :target])
     end
     it 'does not invalid names' do
       expect { described_class.new(name: 'foo bar') }.to raise_error(Puppet::Error, %r{Invalid value})
@@ -18,16 +18,20 @@ describe Puppet::Type.type(:postgresql_conf) do
     it 'allows dots in names' do
       expect { described_class.new(name: 'foo.bar') }.not_to raise_error
     end
+    it 'defaults the title to :name' do
+      resource = described_class.new(title: 'foo.bar')
+      expect(resource.name).to eq('foo.bar')
+    end
   end
 
   describe 'when validating attributes' do
-    [:name, :provider].each do |param|
+    [:name, :provider, :target].each do |param|
       it "should have a #{param} parameter" do
         expect(described_class.attrtype(param)).to eq(:param)
       end
     end
 
-    [:value, :target].each do |property|
+    [:value].each do |property|
       it "should have a #{property} property" do
         expect(described_class.attrtype(property)).to eq(:property)
       end
